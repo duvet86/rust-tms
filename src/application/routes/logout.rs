@@ -3,11 +3,21 @@ use async_session::{MemoryStore, SessionStore};
 use axum::{
     extract::State,
     response::{IntoResponse, Redirect},
+    routing::get,
+    Router,
 };
 use axum_extra::{headers, TypedHeader};
-use tsm::{AppError, COOKIE_NAME};
 
-pub async fn logout_handler(
+use crate::application::utils::{
+    app_state::AppState,
+    http_utils::{AppError, COOKIE_NAME},
+};
+
+pub fn router() -> Router<AppState> {
+    Router::new().route("/logout", get(logout_handler))
+}
+
+async fn logout_handler(
     State(store): State<MemoryStore>,
     TypedHeader(cookies): TypedHeader<headers::Cookie>,
 ) -> Result<impl IntoResponse, AppError> {

@@ -3,15 +3,26 @@ use async_session::{serde_json, MemoryStore, Session, SessionStore};
 use axum::{
     extract::{Query, State},
     response::{IntoResponse, Redirect},
+    routing::get,
+    Router,
 };
 use http::{header::SET_COOKIE, HeaderMap};
 use oauth2::TokenResponse;
-use tsm::{AppError, AuthRequest, MyAuth, COOKIE_NAME};
 use url::Url;
 
-use crate::models::user::User;
+use crate::application::{
+    models::User,
+    utils::{
+        app_state::{AppState, MyAuth},
+        http_utils::{AppError, AuthRequest, COOKIE_NAME},
+    },
+};
 
-pub async fn authorized_handler(
+pub fn router() -> Router<AppState> {
+    Router::new().route("/auth/authorized", get(authorized_handler))
+}
+
+async fn authorized_handler(
     Query(query): Query<AuthRequest>,
     State(store): State<MemoryStore>,
     State(auth): State<MyAuth>,

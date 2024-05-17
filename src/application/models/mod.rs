@@ -10,7 +10,8 @@ use http::{
     request::Parts,
 };
 use serde::{Deserialize, Serialize};
-use tsm::{AuthRedirect, COOKIE_NAME};
+
+use crate::application::utils::http_utils::{AuthRedirect, COOKIE_NAME};
 
 // The user data we'll get back from Microsoft Graph.
 #[derive(Debug, Serialize, Deserialize)]
