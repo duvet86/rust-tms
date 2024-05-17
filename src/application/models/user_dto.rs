@@ -15,7 +15,7 @@ use crate::application::utils::http_utils::{AuthRedirect, COOKIE_NAME};
 
 // The user data we'll get back from Microsoft Graph.
 #[derive(Debug, Serialize, Deserialize)]
-pub struct User {
+pub struct UserDto {
     #[serde(rename = "displayName")]
     pub display_name: String,
     #[serde(rename = "givenName")]
@@ -27,7 +27,7 @@ pub struct User {
 }
 
 #[async_trait]
-impl<S> FromRequestParts<S> for User
+impl<S> FromRequestParts<S> for UserDto
 where
     MemoryStore: FromRef<S>,
     S: Send + Sync,
@@ -56,7 +56,7 @@ where
             .unwrap()
             .ok_or(AuthRedirect)?;
 
-        let user = session.get::<User>("user").ok_or(AuthRedirect)?;
+        let user = session.get::<UserDto>("user").ok_or(AuthRedirect)?;
 
         Ok(user)
     }

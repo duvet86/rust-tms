@@ -11,7 +11,7 @@ use oauth2::TokenResponse;
 use url::Url;
 
 use crate::application::{
-    models::User,
+    models::user_dto::UserDto,
     utils::{
         app_state::{AppState, MyAuth},
         http_utils::{AppError, AuthRequest, COOKIE_NAME},
@@ -52,7 +52,7 @@ async fn authorized_handler(
         .text()
         .await?;
 
-    let user: User = serde_json::from_str(&text).unwrap();
+    let user: UserDto = serde_json::from_str(&text).unwrap();
 
     println!("\n\nresp {user:?}");
 
