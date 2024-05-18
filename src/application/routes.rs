@@ -6,6 +6,8 @@ use sqlx::PgPool;
 use tokio::net::TcpListener;
 
 mod authorized;
+mod customers;
+mod forbidden;
 mod index;
 mod login;
 mod logout;
@@ -53,7 +55,7 @@ fn create_app(db: PgPool) -> Router {
     let app_state = AppState {
         store,
         auth: MyAuth { code_flow },
-        db,
+        db_pool: db,
     };
 
     Router::new()
@@ -62,5 +64,7 @@ fn create_app(db: PgPool) -> Router {
         .merge(authorized::router())
         .merge(protected::router())
         .merge(logout::router())
+        .merge(customers::router())
+        .merge(forbidden::router())
         .with_state(app_state)
 }

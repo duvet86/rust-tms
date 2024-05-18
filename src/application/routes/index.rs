@@ -4,7 +4,7 @@ use axum::{
     Router,
 };
 
-use crate::application::{models::user_dto::UserDto, utils::app_state::AppState};
+use crate::{application::utils::app_state::AppState, models::user_dto::UserDto};
 
 pub fn router() -> Router<AppState> {
     Router::new().route("/", get(index_handler))

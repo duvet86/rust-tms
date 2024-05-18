@@ -7,7 +7,7 @@ use sqlx::PgPool;
 pub struct AppState {
     pub store: MemoryStore,
     pub auth: MyAuth,
-    pub db: PgPool,
+    pub db_pool: PgPool,
 }
 
 pub struct MyAuth {
@@ -28,7 +28,7 @@ impl FromRef<AppState> for MyAuth {
 
 impl FromRef<AppState> for PgPool {
     fn from_ref(state: &AppState) -> Self {
-        state.db.clone()
+        state.db_pool.clone()
     }
 }
 

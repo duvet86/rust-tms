@@ -10,12 +10,12 @@ use http::{header::SET_COOKIE, HeaderMap};
 use oauth2::TokenResponse;
 use url::Url;
 
-use crate::application::{
-    models::user_dto::UserDto,
-    utils::{
+use crate::{
+    application::utils::{
         app_state::{AppState, MyAuth},
         http_utils::{AppError, AuthRequest, COOKIE_NAME},
     },
+    models::user_dto::UserDto,
 };
 
 pub fn router() -> Router<AppState> {

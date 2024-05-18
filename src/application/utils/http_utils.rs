@@ -15,7 +15,7 @@ pub struct AuthRedirect;
 
 impl IntoResponse for AuthRedirect {
     fn into_response(self) -> Response {
-        Redirect::temporary("/auth/login").into_response()
+        Redirect::temporary("/401").into_response()
     }
 }
 
