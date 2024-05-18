@@ -11,7 +11,7 @@ use crate::models::user_dto::UserDto;
 
 pub fn router() -> Router<AppState> {
     Router::new().route(
-        "/api/customers",
+        "/customers",
         get(customers_list_handler).post(create_customer_handler),
     )
 }
