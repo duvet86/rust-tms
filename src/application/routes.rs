@@ -1,22 +1,14 @@
 use anyhow::Context;
-use async_session::MemoryStore;
 use axum::{middleware, Router};
 use listenfd::ListenFd;
 use sqlx::PgPool;
 use tokio::net::TcpListener;
 
-mod authorized;
 mod customers;
 mod forbidden;
 mod index;
-mod login;
-mod logout;
-mod protected;
 
-use super::{
-    auth::{auth_middlewere, get_code_flow},
-    utils::app_state::{AppState, MyAuth},
-};
+use super::{auth::auth_middlewere, utils::app_state::AppState};
 
 pub async fn serve(db: PgPool) -> anyhow::Result<()> {
     let app = create_app(db);
@@ -49,14 +41,10 @@ pub async fn serve(db: PgPool) -> anyhow::Result<()> {
 }
 
 fn create_app(db: PgPool) -> Router {
-    let code_flow = get_code_flow();
+    // let code_flow = get_code_flow();
 
-    let store = MemoryStore::new();
-    let app_state = AppState {
-        store,
-        auth: MyAuth { code_flow },
-        db_pool: db,
-    };
+    // let store = MemoryStore::new();
+    let app_state = AppState { db_pool: db };
 
     let api_routes = Router::new()
         .merge(customers::router())
@@ -64,10 +52,6 @@ fn create_app(db: PgPool) -> Router {
 
     Router::new()
         .merge(index::router())
-        .merge(login::router())
-        .merge(authorized::router())
-        .merge(protected::router())
-        .merge(logout::router())
         .merge(forbidden::router())
         .nest("/api", api_routes)
         .with_state(app_state)

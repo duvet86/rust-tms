@@ -7,7 +7,6 @@ use crate::application::utils::{app_state::AppState, http_utils::AppError};
 use crate::domain::aggregates::customer::Customer;
 use crate::infrastructure::repositories::customer_repository::{CustomerRepository, Repository};
 use crate::models::customer_dto::{CreateCustomerRequest, CustomerDto};
-use crate::models::user_dto::UserDto;
 
 pub fn router() -> Router<AppState> {
     Router::new().route(
@@ -17,7 +16,6 @@ pub fn router() -> Router<AppState> {
 }
 
 async fn customers_list_handler(
-    _: UserDto,
     State(db_pool): State<PgPool>,
 ) -> Result<impl IntoResponse, AppError> {
     let customers = sqlx::query("SELECT * FROM customers")
@@ -35,7 +33,6 @@ async fn customers_list_handler(
 }
 
 async fn create_customer_handler(
-    _: UserDto,
     State(db_pool): State<PgPool>,
     Json(req): Json<CreateCustomerRequest>,
 ) -> Result<Json<CustomerDto>, AppError> {
