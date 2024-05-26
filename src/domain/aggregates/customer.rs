@@ -9,6 +9,10 @@ pub struct Customer {
 }
 
 impl Customer {
+    pub fn id(&self) -> i32 {
+        self.id
+    }
+
     pub fn new(
         id: i32,
         name: &str,

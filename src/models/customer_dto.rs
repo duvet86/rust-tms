@@ -3,6 +3,7 @@ use validator::Validate;
 
 // The user data we'll get back from Microsoft Graph.
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct CustomerDto {
     pub id: i32,
     pub name: String,

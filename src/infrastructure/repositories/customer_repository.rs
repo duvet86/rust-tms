@@ -20,8 +20,8 @@ impl CustomerRepository {
 #[async_trait]
 pub trait Repository {
     async fn by_id(&self, id: i32) -> Result<Customer>;
-    async fn create(&self, customer: Customer) -> Result<i32>;
-    async fn update(&self, customer: Customer) -> Result<bool>;
+    async fn create<'a, 'b>(&'a self, customer: &'b Customer) -> Result<i32>;
+    async fn update<'a, 'b>(&'a self, customer: &'b Customer) -> Result<bool>;
 }
 
 #[async_trait]
@@ -47,7 +47,7 @@ impl Repository for CustomerRepository {
         ))
     }
 
-    async fn create(&self, customer: Customer) -> Result<i32> {
+    async fn create<'a, 'b>(&'a self, customer: &'b Customer) -> Result<i32> {
         let record = sqlx::query!(
             r#"
 INSERT INTO customers (name, email, address, contact_number)
@@ -65,7 +65,7 @@ RETURNING id
         Ok(record.id)
     }
 
-    async fn update(&self, customer: Customer) -> Result<bool> {
+    async fn update<'a, 'b>(&'a self, customer: &'b Customer) -> Result<bool> {
         let rows_affected = sqlx::query!(
             r#"
 UPDATE customers SET name = $1, email = $2, address = $3, contact_number = $4
