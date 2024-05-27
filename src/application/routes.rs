@@ -7,6 +7,8 @@ use tokio::net::TcpListener;
 use tower_http::cors::CorsLayer;
 
 mod customers;
+mod vendors;
+
 mod forbidden;
 mod index;
 mod me;
@@ -47,8 +49,9 @@ fn create_app(db: PgPool) -> Router {
     let app_state = AppState { db_pool: db };
 
     let api_routes = Router::new()
-        .merge(customers::router())
         .merge(me::router())
+        .merge(customers::router())
+        .merge(vendors::router())
         .route_layer(from_extractor::<RequireAuth>());
 
     Router::new()

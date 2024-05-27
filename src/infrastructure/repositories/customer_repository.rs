@@ -48,6 +48,11 @@ impl Repository for CustomerRepository {
     }
 
     async fn create<'a, 'b>(&'a self, customer: &'b Customer) -> Result<i32> {
+        match customer.id() {
+            value if value != 0 => panic!("Customer id must be 0."),
+            _ => (),
+        }
+
         let record = sqlx::query!(
             r#"
 INSERT INTO customers (name, email, address, contact_number)
@@ -66,6 +71,11 @@ RETURNING id
     }
 
     async fn update<'a, 'b>(&'a self, customer: &'b Customer) -> Result<bool> {
+        match customer.id() {
+            value if value == 0 => panic!("Customer id cannot be 0."),
+            _ => (),
+        }
+
         let rows_affected = sqlx::query!(
             r#"
 UPDATE customers SET name = $1, email = $2, address = $3, contact_number = $4

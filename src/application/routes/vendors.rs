@@ -6,67 +6,67 @@ use http::{HeaderName, StatusCode};
 use sqlx::PgPool;
 
 use crate::application::utils::{app_state::AppState, http_utils::AppError};
-use crate::domain::aggregates::customer::Customer;
-use crate::infrastructure::queries::customer_queries::{get_customer_by_id, list_customers};
-use crate::infrastructure::repositories::customer_repository::{CustomerRepository, Repository};
-use crate::models::customer_dto::{CreateCustomerRequest, CustomerDto};
+use crate::domain::aggregates::vendor::Vendor;
+use crate::infrastructure::queries::vendor_queries::{get_vendor_by_id, list_vendors};
+use crate::infrastructure::repositories::vendor_repository::{Repository, VendorRepository};
+use crate::models::vendor_dto::{CreateVendorRequest, VendorDto};
 
 pub fn router() -> Router<AppState> {
     Router::new()
         .route(
-            "/customers",
-            get(customers_list_handler).post(create_customer_handler),
+            "/vendors",
+            get(vendors_list_handler).post(create_vendor_handler),
         )
         .route(
-            "/customers/:id",
-            get(customer_handler).put(update_customer_handler),
+            "/vendors/:id",
+            get(vendor_handler).put(update_vendor_handler),
         )
 }
 
-async fn customers_list_handler(
+async fn vendors_list_handler(
     State(db_pool): State<PgPool>,
 ) -> Result<impl IntoResponse, AppError> {
-    let customers = list_customers(db_pool).await?;
+    let vendors = list_vendors(db_pool).await?;
 
-    Ok(Json(customers))
+    Ok(Json(vendors))
 }
 
-async fn customer_handler(
+async fn vendor_handler(
     Path(id): Path<i32>,
     State(db_pool): State<PgPool>,
 ) -> Result<impl IntoResponse, AppError> {
-    let customer = get_customer_by_id(db_pool, id).await?;
+    let vendor = get_vendor_by_id(db_pool, id).await?;
 
-    match customer {
+    match vendor {
         Some(c) => Ok((StatusCode::OK, Json(c)).into_response()),
         None => Ok((StatusCode::NOT_FOUND).into_response()),
     }
 }
 
-async fn update_customer_handler(
+async fn update_vendor_handler(
     Path(id): Path<i32>,
     State(db_pool): State<PgPool>,
-    Json(req): Json<CreateCustomerRequest>,
+    Json(req): Json<CreateVendorRequest>,
 ) -> Result<impl IntoResponse, AppError> {
-    let repo = CustomerRepository::new(db_pool);
+    let repo = VendorRepository::new(db_pool);
 
-    let mut customer = repo
+    let mut vendor = repo
         .by_id(id)
         .await
         .map_err(|_| (StatusCode::NOT_FOUND).into_response())
         .unwrap();
 
-    customer.update(
+    vendor.update(
         &req.name,
         &req.email,
         &req.address,
         req.contact_number.as_deref(),
     );
 
-    repo.update(&customer).await?;
+    repo.update(&vendor).await?;
 
-    let dto = CustomerDto {
-        id: customer.id(),
+    let dto = VendorDto {
+        id: vendor.id(),
         name: req.name,
         address: req.address,
         contact_number: req.contact_number,
@@ -76,20 +76,20 @@ async fn update_customer_handler(
     Ok(Json(dto))
 }
 
-async fn create_customer_handler(
+async fn create_vendor_handler(
     State(db_pool): State<PgPool>,
-    Json(req): Json<CreateCustomerRequest>,
+    Json(req): Json<CreateVendorRequest>,
 ) -> Result<
     (
         StatusCode,
         [(HeaderName, std::string::String); 1],
-        axum::Json<CustomerDto>,
+        axum::Json<VendorDto>,
     ),
     AppError,
 > {
-    let repo = CustomerRepository::new(db_pool);
+    let repo = VendorRepository::new(db_pool);
 
-    let customer_domain = Customer::new(
+    let vendor_domain = Vendor::new(
         0,
         &req.name,
         &req.email,
@@ -97,9 +97,9 @@ async fn create_customer_handler(
         req.contact_number.as_deref(),
     );
 
-    let id = repo.create(&customer_domain).await?;
+    let id = repo.create(&vendor_domain).await?;
 
-    let dto = CustomerDto {
+    let dto = VendorDto {
         id,
         name: req.name,
         address: req.address,
@@ -107,7 +107,7 @@ async fn create_customer_handler(
         email: req.email,
     };
 
-    let location_header = [(LOCATION, format!("/v1/api/customers/{}", id))];
+    let location_header = [(LOCATION, format!("/v1/api/vendors/{}", id))];
 
     Ok((StatusCode::CREATED, location_header, Json(dto)))
 }

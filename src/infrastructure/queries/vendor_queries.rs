@@ -1,11 +1,11 @@
 use anyhow::Result;
 use sqlx::{postgres::PgRow, PgPool, Row};
 
-use crate::models::customer_dto::CustomerDto;
+use crate::models::vendor_dto::VendorDto;
 
-pub async fn list_customers(db_pool: PgPool) -> Result<Vec<CustomerDto>> {
-    let customers = sqlx::query("SELECT * FROM customers ORDER BY name")
-        .map(|row: PgRow| CustomerDto {
+pub async fn list_vendors(db_pool: PgPool) -> Result<Vec<VendorDto>> {
+    let vendors = sqlx::query("SELECT * FROM vendors ORDER BY name")
+        .map(|row: PgRow| VendorDto {
             id: row.get("id"),
             name: row.get("name"),
             address: row.get("address"),
@@ -15,13 +15,13 @@ pub async fn list_customers(db_pool: PgPool) -> Result<Vec<CustomerDto>> {
         .fetch_all(&db_pool)
         .await?;
 
-    Ok(customers)
+    Ok(vendors)
 }
 
-pub async fn get_customer_by_id(db_pool: PgPool, id: i32) -> Result<Option<CustomerDto>> {
-    let customer = sqlx::query("SELECT * FROM customers WHERE id = $1")
+pub async fn get_vendor_by_id(db_pool: PgPool, id: i32) -> Result<Option<VendorDto>> {
+    let vendor = sqlx::query("SELECT * FROM vendors WHERE id = $1")
         .bind(id)
-        .map(|row: PgRow| CustomerDto {
+        .map(|row: PgRow| VendorDto {
             id: row.get("id"),
             name: row.get("name"),
             address: row.get("address"),
@@ -31,5 +31,5 @@ pub async fn get_customer_by_id(db_pool: PgPool, id: i32) -> Result<Option<Custo
         .fetch_optional(&db_pool)
         .await?;
 
-    Ok(customer)
+    Ok(vendor)
 }
